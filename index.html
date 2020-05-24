@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+
+    <title>Hiragana Writing Skills</title>
+    <meta name="author" content="Fabio Lorenzi">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+        integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+</head>
+
+<body>
+    <style>
+        kbd {
+            margin: 0px 0.1em;
+            padding: 0.1em 0.6em;
+            border-radius: 3px;
+            border: 1px solid rgb(204, 204, 204);
+            color: rgb(51, 51, 51);
+            line-height: 1.4;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 10px;
+            display: inline-block;
+            box-shadow: 0px 1px 0px rgba(0, 0, 0, 0.2), inset 0px 0px 0px 2px #ffffff;
+            background-color: rgb(247, 247, 247);
+            -moz-box-shadow: 0 1px 0px rgba(0, 0, 0, 0.2), 0 0 0 2px #ffffff inset;
+            -webkit-box-shadow: 0 1px 0px rgba(0, 0, 0, 0.2), 0 0 0 2px #ffffff inset;
+            -moz-border-radius: 3px;
+            -webkit-border-radius: 3px;
+            text-shadow: 0 1px 0 #fff;
+        }
+    </style>
+    <nav class="navbar navbar-dark bg-dark text-light navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <span>&#12402;&#12425;&#12364;&#12394; </span> ~ Hiragana Writing Skills
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <div class="row mb-4">
+            <div class="card h-100 mx-auto rounded kana-card">
+                <div class="card-header bg-dark text-light">
+                    <h3>Kana</h3>
+                </div>
+                <div class="card-body">
+                    <div class="card-header d-flex justify-content-center bg-dark text-light">
+                        <h4><b>O</b></h4>
+                    </div>
+                    <canvas id="canvas" class="canvas w-100 h-100"></canvas>
+                </div>
+                <div class="card-footer">
+                    <ul>
+                        <li>Press <kbd>spacebar</kbd> to submit</li>
+                        <li>Press <kbd>r</kbd> to reset</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous">
+    </script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+        integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/3.6.3/fabric.min.js"
+        integrity="sha256-5UWHWUlXFur+ZdbsTp452jjVSbIHS7rdOXsCVyoQppM=" crossorigin="anonymous"></script>
+    <script>
+        $(document).ready(function () {
+            var canvas;
+            (function () {
+                canvas = this.__canvas = new fabric.Canvas('canvas', {
+                    isDrawingMode: true,
+                    backgroundColor: '#fafafa'
+                });
+                fabric.Object.prototype.transparentCorners = false;
+                canvas.freeDrawingBrush.color = '#333';
+                canvas.freeDrawingBrush.width = 8;
+            })();
+            $(window).keypress(e => {
+                if (e.key === ' ' || e.key === 'Spacebar') {
+                    // ' ' is standard, 'Spacebar' was used by IE9 and Firefox < 37
+                    e.preventDefault()
+                        (function () {
+                            var user_ch = identify() // TODO implement identify vs. NN
+                            // if user_ch == test_ch -> Ok, move on
+                            if (true) {
+
+                            }
+                            // if no_match -> signal error, wipe board, repeat
+                            else {
+
+                            }
+                        })();
+                }
+                if (e.key == 'r') {
+                    e.preventDefault()
+                    canvas.clear()
+                    canvas.backgroundColor = '#fafafa'
+                }
+            })
+        });
+    </script>
+</body>
+
+</html>

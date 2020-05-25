@@ -13,6 +13,7 @@
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
         integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link rel="stylesheet" href="https//code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
 </head>
 
 <body>
@@ -46,7 +47,7 @@
 
     <div class="container-fluid mt-4">
         <div class="row mb-4">
-            <div class="card h-100 mx-auto rounded kana-card">
+            <div id="kana-card" class="card h-100 mx-auto rounded">
                 <div class="card-header bg-dark text-light">
                     <h3>Kana</h3>
                 </div>
@@ -69,9 +70,8 @@
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
-        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous">
-    </script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"
+        integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
         integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous">
     </script>
@@ -80,41 +80,54 @@
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/3.6.3/fabric.min.js"
         integrity="sha256-5UWHWUlXFur+ZdbsTp452jjVSbIHS7rdOXsCVyoQppM=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.0/dist/tf.min.js"></script>
+
     <script>
         $(document).ready(function () {
-            var canvas;
-            (function () {
-                canvas = this.__canvas = new fabric.Canvas('canvas', {
-                    isDrawingMode: true,
-                    backgroundColor: '#fafafa'
-                });
-                fabric.Object.prototype.transparentCorners = false;
-                canvas.freeDrawingBrush.color = '#333';
-                canvas.freeDrawingBrush.width = 8;
-            })();
-            $(window).keypress(e => {
+        var canvas;
+        (function () {
+            canvas = this.__canvas = new fabric.Canvas('canvas', {
+                isDrawingMode: true,
+                backgroundColor: '#fafafa'
+            });
+            fabric.Object.prototype.transparentCorners = false;
+            canvas.freeDrawingBrush.color = '#333';
+            canvas.freeDrawingBrush.width = 8;
+        })();
+        $(window).keypress(e => {
                 if (e.key === ' ' || e.key === 'Spacebar') {
-                    // ' ' is standard, 'Spacebar' was used by IE9 and Firefox < 37
-                    e.preventDefault()
-                        (function () {
-                            var user_ch = identify() // TODO implement identify vs. NN
-                            // if user_ch == test_ch -> Ok, move on
-                            if (true) {
-
-                            }
-                            // if no_match -> signal error, wipe board, repeat
-                            else {
-
-                            }
-                        })();
-                }
-                if (e.key == 'r') {
-                    e.preventDefault()
-                    canvas.clear()
-                    canvas.backgroundColor = '#fafafa'
-                }
-            })
+                    // ' ' is standard, 'Spacebar' was used by IE9 and Firefox < 37 e.preventDefault(); getKana(); (function () { //var
+                    user_ch =
+                        identify() // TODO implement identify vs. NN // if user_ch==test_ch -> Ok, move on
+                    if (true) {}
+                    // if no_match -> signal error, wipe board, repeat
+                    else {}
+                })();
+        }
+        if (e.key == 'r') {
+            e.preventDefault()
+            canvas.clear()
+            canvas.backgroundColor = '#fafafa'
+        }
+        })
         });
+
+        function getKana() {
+            _canvas = $('#canvas')[0]
+            img = _canvas.getContext('2d').getImageData(0, 0, _canvas.width, _canvas.height)
+            console.log(to_greyscale(img))
+        }
+
+        function to_greyscale(imageData) {
+            var data = imageData.data
+            for (var i = 0; i < data.length; i += 4) {
+                var brightness = 0.34 * data[i] + 0.5 * data[i + 1] + 0.16 * data[i + 2]
+                data[i] = brightness data[i + 1] = brightness data[i + 2] = brightness
+            }
+            return imageData
+        }
+
+        function identify() {}
     </script>
 </body>
 

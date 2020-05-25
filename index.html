@@ -83,51 +83,58 @@
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.0/dist/tf.min.js"></script>
 
     <script>
-        $(document).ready(function () {
-        var canvas;
-        (function () {
-            canvas = this.__canvas = new fabric.Canvas('canvas', {
-                isDrawingMode: true,
-                backgroundColor: '#fafafa'
-            });
-            fabric.Object.prototype.transparentCorners = false;
-            canvas.freeDrawingBrush.color = '#333';
-            canvas.freeDrawingBrush.width = 8;
+        label_encoding = [] // translates tensor from the network to a phonetic label e.g. NU
+        let model;
+        (async () => {
+            model = await tf.loadLayersModel('/res/model.json');
         })();
-        $(window).keypress(e => {
+
+        $(document).ready(function () {
+            var canvas;
+            (function () {
+                canvas = this.__canvas = new fabric.Canvas('canvas', {
+                    isDrawingMode: true,
+                    backgroundColor: '#000'
+                });
+                fabric.Object.prototype.transparentCorners = false;
+                canvas.freeDrawingBrush.color = '#fff';
+                canvas.freeDrawingBrush.width = 8;
+            })();
+            $(window).keypress(e => {
                 if (e.key === ' ' || e.key === 'Spacebar') {
                     // ' ' is standard, 'Spacebar' was used by IE9 and Firefox < 37 e.preventDefault(); getKana(); (function () { //var
-                    user_ch =
-                        identify() // TODO implement identify vs. NN // if user_ch==test_ch -> Ok, move on
-                    if (true) {}
+                    user_ch = identify(
+                        getKana()
+                    ) // TODO implement identify vs. NN // if user_ch==test_ch -> Ok, move on
+                    if (true) {
+                        console.log(user_ch)
+                    }
                     // if no_match -> signal error, wipe board, repeat
                     else {}
-                })();
-        }
-        if (e.key == 'r') {
-            e.preventDefault()
-            canvas.clear()
-            canvas.backgroundColor = '#fafafa'
-        }
+                }
+                if (e.key == 'r') {
+                    e.preventDefault()
+                    canvas.clear()
+                    canvas.backgroundColor = '#000'
+                }
+            });
         })
-        });
 
         function getKana() {
             _canvas = $('#canvas')[0]
-            img = _canvas.getContext('2d').getImageData(0, 0, _canvas.width, _canvas.height)
-            console.log(to_greyscale(img))
+            tfImage = tf.browser.fromPixels(_canvas, 1).mean(2)
+                .toFloat()
+                .expandDims(0)
+                .expandDims(-1);
+            var tfResizedImage = tf.image.resizeBilinear(tfImage, [84, 83], true);
+            return tfResizedImage
         }
 
-        function to_greyscale(imageData) {
-            var data = imageData.data
-            for (var i = 0; i < data.length; i += 4) {
-                var brightness = 0.34 * data[i] + 0.5 * data[i + 1] + 0.16 * data[i + 2]
-                data[i] = brightness data[i + 1] = brightness data[i + 2] = brightness
-            }
-            return imageData
+        function identify(img) {
+            a = Array.from(model.predict(img).dataSync());
+            i = a.findIndex((e) => e == 1)
+            return le[i]
         }
-
-        function identify() {}
     </script>
 </body>
 

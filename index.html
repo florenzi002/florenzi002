@@ -55,7 +55,7 @@
                     <div class="card-header d-flex justify-content-center bg-dark text-light">
                         <h4><b>O</b></h4>
                     </div>
-                    <canvas id="canvas" class="canvas w-100 h-100"></canvas>
+                    <canvas id="canvas" class="canvas w-100"></canvas>
                 </div>
                 <div class="card-footer">
                     <ul>
@@ -83,7 +83,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.0/dist/tf.min.js"></script>
 
     <script>
-        label_encoding = [] // translates tensor from the network to a phonetic label e.g. NU
         let model;
         (async () => {
             model = await tf.loadLayersModel('/res/model.json');
@@ -96,6 +95,8 @@
                     isDrawingMode: true,
                     backgroundColor: '#000'
                 });
+                canvas.setWidth($('#canvas').width())
+                canvas.setHeight($('#canvas').width())
                 fabric.Object.prototype.transparentCorners = false;
                 canvas.freeDrawingBrush.color = '#fff';
                 canvas.freeDrawingBrush.width = 8;

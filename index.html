@@ -45,23 +45,43 @@
         </div>
     </nav>
 
-    <div class="container-fluid mt-4">
-        <div class="row mb-4">
-            <div id="kana-card" class="card h-100 mx-auto rounded">
-                <div class="card-header bg-dark text-light">
-                    <h3>Kana</h3>
-                </div>
-                <div class="card-body">
-                    <div class="card-header d-flex justify-content-center bg-dark text-light">
-                        <h4><b>O</b></h4>
+    <div class="container mt-4">
+        <div class="row mb-4 mr-4">
+            <div class="column">
+                <div id="debug_card" class="card h-100 mx-auto rounded">
+                    <div class="card-header bg-dark text-light">
+                        <h3>Examples</h3>
                     </div>
-                    <canvas id="canvas" class="canvas w-100"></canvas>
+                    <div class="card-body">
+                        <div class="card mb-4">
+                            <canvas id="canvas_recognition" class="canvas mx-auto m-1" height="32" width="32"
+                                style="width:32px; height:32px">
+                        </div>
+                        <div class="card">
+                            <canvas id="canvas_sample" class="canvas mx-auto m-1" height="32" width="32"
+                                style="width:32px; height:32px"></canvas>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-footer">
-                    <ul>
-                        <li>Press <kbd>spacebar</kbd> to submit</li>
-                        <li>Press <kbd>r</kbd> to reset</li>
-                    </ul>
+            </div>
+            <div class="column ml-4">
+                <div id="kana-card" class="card h-100 mx-auto rounded">
+                    <div class="card-header bg-dark text-light">
+                        <h3>Kana</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-header d-flex justify-content-center bg-dark text-light">
+                            <h4><b>O</b></h4>
+                        </div>
+                        <canvas id="canvas" class="canvas"></canvas>
+                        <div id="result"></div>
+                    </div>
+                    <div class="card-footer">
+                        <ul>
+                            <li>Press <kbd>spacebar</kbd> to submit</li>
+                            <li>Press <kbd>r</kbd> to reset</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -93,10 +113,10 @@
             (function () {
                 canvas = this.__canvas = new fabric.Canvas('canvas', {
                     isDrawingMode: true,
-                    backgroundColor: '#000'
+                    backgroundColor: '#000',
+                    width: $('#canvas').width(),
+                    height: $('#canvas').width()
                 });
-                canvas.setWidth($('#canvas').width())
-                canvas.setHeight($('#canvas').width())
                 fabric.Object.prototype.transparentCorners = false;
                 canvas.freeDrawingBrush.color = '#fff';
                 canvas.freeDrawingBrush.width = 8;
@@ -108,7 +128,8 @@
                         getKana()
                     ) // TODO implement identify vs. NN // if user_ch==test_ch -> Ok, move on
                     if (true) {
-                        console.log(user_ch)
+                        $('#result').html("" + user_ch[0] + ": " + user_ch[1])
+
                     }
                     // if no_match -> signal error, wipe board, repeat
                     else {}
@@ -117,24 +138,36 @@
                     e.preventDefault()
                     canvas.clear()
                     canvas.backgroundColor = '#000'
+                    $('#canvas_recognition')[0].getContext('2d').clearRect(0, 0, 32, 32);
+                    $('#canvas_sample')[0].getContext('2d').clearRect(0, 0, 32, 32);
+                    $('#result').html('')
                 }
             });
         })
 
         function getKana() {
             _canvas = $('#canvas')[0]
-            tfImage = tf.browser.fromPixels(_canvas, 1).mean(2)
-                .toFloat()
-                .expandDims(0)
-                .expandDims(-1);
-            var tfResizedImage = tf.image.resizeBilinear(tfImage, [84, 83], true);
-            return tfResizedImage
+            tfImage = tf.browser.fromPixels(_canvas, 1)
+                .resizeBilinear([32, 32])
+                .cast('float32')
+                .div(255)
+                .mul(12 / 15)
+            return tfImage
         }
 
         function identify(img) {
-            a = Array.from(model.predict(img).dataSync());
-            i = a.findIndex((e) => e == 1)
-            return le[i]
+            tf.browser.toPixels(img, $('#canvas_recognition')[0])
+            a = Array.from(model.predict(img.reshape([1, 32, 32, 1])).dataSync())
+            p = Math.max(...a)
+            i = a.indexOf(p)
+            context = $('#canvas_sample')[0].getContext('2d')
+            base_image = new Image()
+            base_image.onload = function () {
+                context.drawImage(base_image, 0, 0, 32, 32);
+            };
+            base_image.src = '/imgs/img' + i + '_S.png';
+            console.log(base_image.src);
+            return [i, p]
         }
     </script>
 </body>

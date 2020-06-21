@@ -47,7 +47,7 @@
 
     <div class="container mt-4">
         <div class="row mb-4 mr-4">
-            <div class="column">
+            <div class="column mx-auto">
                 <div id="debug_card" class="card h-100 mx-auto rounded">
                     <div class="card-header bg-dark text-light">
                         <h3>Debug Card</h3>
@@ -64,14 +64,13 @@
                     </div>
                 </div>
             </div>
-            <div class="column ml-4">
+            <div class="column mx-auto">
                 <div id="kana-card" class="card h-100 mx-auto rounded">
                     <div class="card-header bg-dark text-light">
                         <h3>Kana</h3>
                     </div>
                     <div class="card-body">
-                        <div class="card-header d-flex justify-content-center bg-dark text-light">
-                            <h4><b>O</b></h4>
+                        <div id="sound" class="card-header d-flex justify-content-center bg-dark text-light">
                         </div>
                         <canvas id="canvas" class="canvas"></canvas>
                         <div id="result"></div>
@@ -81,6 +80,16 @@
                             <li>Press <kbd>spacebar</kbd> to submit</li>
                             <li>Press <kbd>r</kbd> to reset</li>
                         </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="column mx-auto">
+                <div id="kana-card" class="card h-100 mx-auto rounded">
+                    <div class="card-header bg-dark text-light">
+                        <h3>Reference Kana</h3>
+                    </div>
+                    <div class="card-body align-items-center d-flex justify-content-center">
+                        <h1 id="correct-char" class="display-1 mx-auto my-auto"></h1>
                     </div>
                 </div>
             </div>
@@ -101,12 +110,38 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/3.6.3/fabric.min.js"
         integrity="sha256-5UWHWUlXFur+ZdbsTp452jjVSbIHS7rdOXsCVyoQppM=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.0/dist/tf.min.js"></script>
-
+    <script src="https://unpkg.com/wanakana"></script>
     <script>
+        const chars = ['a', 'ka', 'ga', 'sa', 'za', 'ta', 'da', 'na', 'ha', 'ba', 'pa', 'ma', 'ya', 'ra', 'wa', 'i',
+            'ki', 'gi', 'shi', '(s)ji', 'chi', '(d)ji', 'ni', 'hi', 'bi', 'pi', 'mi', 'ri', 'u', 'ku', 'gu', 'su',
+            'zu',
+            'tsu', 'dzu', 'nu', 'fu', 'bu', 'pu', 'mu', 'yu', 'ru', 'e', 'ke', 'ge', 'se', 'ze', 'te', 'de', 'ne',
+            'he', 'be', 'pe', 'me', 're', 'o', 'ko', 'go', 'so', 'zo', 'to', 'do', 'no', 'ho', 'bo', 'po', 'mo',
+            'yo', 'ro', 'wo'
+        ]
+        let chars_round = chars.slice()
         let model;
         (async () => {
             model = await tf.loadLayersModel('/res/model.json');
         })();
+
+        function getNextChar(chars) {
+            if (chars.length > 0) {
+                test_ch_i = Math.floor(Math.random() * chars.length);
+                test_ch = chars.splice(test_ch_i, 1)
+                console.log(typeof testch);
+
+                return test_ch
+            } else {
+                chars_round = chars.slice()
+                return null
+            }
+        }
+
+        function nextRound() {
+            alert('new Round')
+            test_ch = getNextChar(chars_round)
+        }
 
         $(document).ready(function () {
             var canvas;
@@ -119,8 +154,17 @@
                 });
                 fabric.Object.prototype.transparentCorners = false;
                 canvas.freeDrawingBrush.color = '#fff';
-                canvas.freeDrawingBrush.width = 8;
+                canvas.freeDrawingBrush.width = 10;
             })();
+            test_ch = getNextChar(chars_round)
+            $('#sound').html(test_ch)
+            $('#correct-char').html(wanakana.toKana(test_ch.toString(), {
+                customKanaMapping: {
+                    '(d)ji': 'ぢ',
+                    '(s)ji': 'じ',
+                    'dzu': 'づ'
+                }
+            }))
             $(window).keypress(e => {
                 if (e.key === ' ' || e.key === 'Spacebar') {
                     // ' ' is standard, 'Spacebar' was used by IE9 and Firefox < 37 e.preventDefault(); getKana(); (function () { //var
@@ -129,7 +173,18 @@
                     ) // TODO implement identify vs. NN // if user_ch==test_ch -> Ok, move on
                     if (true) {
                         $('#result').html("" + user_ch[0] + ": " + user_ch[1])
-
+                        if (!(test_ch = getNextChar(chars_round))) {
+                            nextRound()
+                            chars_round = chars.slice()
+                            test_ch = getNextChar(chars_round)
+                        }
+                        $('#sound').html(test_ch)
+                        $('#correct-char').html(wanakana.toKana(test_ch.toString(), {
+                            customKanaMapping: {
+                                '(d)ji': 'ぢ',
+                                '(s)ji': 'じ'
+                            }
+                        }))
                     }
                     // if no_match -> signal error, wipe board, repeat
                     else {}
